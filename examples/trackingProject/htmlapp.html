@@ -1,0 +1,89 @@
+<html>
+<head>
+<style>
+  body{
+    margin:0;
+    background-color: #666;
+  }
+  #googleMap{
+    margin:30px auto;
+  }
+
+  #titulo{
+    height:80px;
+    background-color: #333;
+    padding:20px 30px;
+    font-family: verdana;
+    color: #ff942d;
+  }
+
+  #copyright{
+    height:20px;
+    background-color: #333;
+    padding:15px 30px;
+    font-family: verdana;
+    color: #AAA;
+  }
+
+  a{
+    font-family: verdana;
+    color: #ff942d;
+    text-decoration: none;
+  }
+</style>
+
+<title>BeagleBone Tracking Cape - Real time tracking</title>
+
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDsR_assH2jz6brvRiRgiF3jSXqM-qIVVI&sensor=false">
+</script>
+
+<script src="http://192.168.1.38:1909/socket.io/socket.io.js"></script>
+
+<script>
+  var myCenter=new google.maps.LatLng(0,0);
+
+  var map;
+  var marker;
+
+  function initialize()
+  {
+    var mapProp = {
+      center:myCenter,
+      zoom:17,
+      mapTypeId:google.maps.MapTypeId.ROADMAP
+    };
+
+    map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
+
+    marker = new google.maps.Marker({
+      position:myCenter
+    });
+
+    marker.setMap(map);
+  }
+
+
+  function moveMarker( map, marker, pos ) {
+  	var coords = pos.split(",");
+    marker.setPosition( new google.maps.LatLng( coords[0], coords[1] ) );
+    map.panTo( new google.maps.LatLng( coords[0], coords[1] ) );
+  };
+
+  google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+
+<script>
+	socket = io.connect('http://192.168.1.38:1909');
+				
+	socket.on('newCoord', function(coord){
+		moveMarker(map,marker,coord.coord);
+	});
+</script>
+
+</head>
+
+<body><div id="titulo"><h2>BeagleBone Tracking Cape - Real time tracking</h2></div>
+<div id="googleMap" style="width:700px;height:500px;"></div>
+<div id="copyright"><a href="http://ciudadoscura.com/beaglebonecape">Ciudad Oscura.</a> Non-commercial use.</div>
+</body>
+</html>
